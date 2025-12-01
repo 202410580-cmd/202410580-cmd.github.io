@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>캐릭터 생성 & 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 250px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px 0;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #charList {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        #charList div {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 6px;
+        }
+        #charList button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>캐릭터 생성</h1>
+
+<div class="char-card">
+    <label>캐릭터 이미지:</label><br>
+    <input type="file" accept="image/*" id="imageInput"><br>
+    <img id="imagePreview" class="preview-img" style="max-width:150px; display:none; border:1px solid #aaa; margin-top:5px;">
+
+    <script>
+        let currentImageData = "";
+
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentImageData = evt.target.result;
+                const preview = document.getElementById('imagePreview');
+                preview.src = currentImageData;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+    <br><br>
+</div>
+
+
+<label>캐릭터 이름</label>
+<input id="charName" type="text" placeholder="예: 렌, 카인, 루미너스 등">
+
+<label style="margin-top:10px; display:block;">캐릭터 설명</label>
+<textarea id="charDesc" placeholder="여기에 캐릭터 템플릿이 자동으로 생성됩니다."></textarea>
+
+<button onclick="applyTemplate()">템플릿 불러오기</button>
+<button onclick="saveCharacter()">저장하기</button>
+<button onclick="clearInput()">작성창 비우기</button>
+
+<hr>
+
+<h2>저장된 캐릭터 목록</h2>
+<div id="charList"></div>
+
+
+<script>
+function applyTemplate() {
+
+    const template = 
+`[기본 정보]
+· 나이:
+· 성별:
+· 종족:
+· 직업 / 역할:
+
+[능력치]
+· 힘:
+· 민첩:
+· 체력:
+· 지능:
+· 감각:
+· 매력:
+
+[배경 이야기]
+여기에 캐릭터의 출생, 성장 과정, 사건 등을 작성하세요.
+
+[스킬 / 기술]
+· 스킬 1:
+· 스킬 2:
+· 스킬 3:
+
+[장비]
+· 무기:
+· 방어구:
+· 기타 장비:
+
+[기타 메모]
+추가적인 특징, 습관, 말투 등을 적으세요.
+`;
+
+    document.getElementById("charDesc").value = template;
+}
+
+function saveCharacter() {
+    const name = document.getElementById("charName").value.trim();
+    const desc = document.getElementById("charDesc").value.trim();
+
+    if (!name || !desc) {
+        alert("캐릭터 이름과 설명을 모두 입력하세요.");
+        return;
+    }
+
+    let list = JSON.parse(localStorage.getItem("characterList") || "[]");
+
+    
+    const existingIndex = list.findIndex(c => c.name === name);
+    if (existingIndex !== -1) {
+        if (!confirm("동일한 이름의 캐릭터가 있습니다. 덮어쓸까요?")) return;
+        list[existingIndex].desc = desc;
+    } else {
+        list.push({ name, desc });
+    }
+
+    localStorage.setItem("characterList", JSON.stringify(list));
+    alert("저장되었습니다!");
+    loadList();
+}
+
+function loadList() {
+    const container = document.getElementById("charList");
+    container.innerHTML = "";
+
+    let list = JSON.parse(localStorage.getItem("characterList") || "[]");
+
+    if (list.length === 0) {
+        container.innerHTML = "<p>저장된 캐릭터가 없습니다.</p>";
+        return;
+    }
+
+    list.forEach((char, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+            <strong>${char.name}</strong><br>
+            <button onclick="loadCharacter(${index})">불러오기</button>
+            <button onclick="deleteCharacter(${index})">삭제</button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function loadCharacter(index) {
+    let list = JSON.parse(localStorage.getItem("characterList") || "[]");
+    const char = list[index];
+
+    document.getElementById("charName").value = char.name;
+    document.getElementById("charDesc").value = char.desc;
+
+    alert("캐릭터가 불러와졌습니다!");
+}
+
+function deleteCharacter(index) {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    let list = JSON.parse(localStorage.getItem("characterList") || "[]");
+    list.splice(index, 1);
+    localStorage.setItem("characterList", JSON.stringify(list));
+
+    loadList();
+}
+
+function clearInput() {
+    document.getElementById("charName").value = "";
+    document.getElementById("charDesc").value = "";
+}
+
+loadList();
+
+</script>
+<div style="text-align:center; margin-top:20px;">
+    <a href="map.html" target="_blank">
+        <button style="padding:10px 20px; font-size:16px;">🗺️ 맵 이동 페이지 열기</button>
+    </a>
+</div>
+
+</body>
+</html>

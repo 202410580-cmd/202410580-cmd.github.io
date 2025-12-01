@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>TRPG 맵</title>
+<style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #map {
+        position: relative;
+        width: 1000px;
+        height: 600px;
+        margin: 20px auto;
+        border: 2px solid #000;
+        background-color: #e0e0e0;
+    }
+    .char {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 10px;
+    }
+    .char img {
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+    }
+        #chatContainer {
+        position: fixed;
+        bottom: 180px;
+        right: 100px;
+        width: 300px;
+        height: 610px;
+        background: rgba(255,255,255,0.9);
+        border: 2px solid #000;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+    #chatMessages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        font-size: 14px;
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+    }
+    #chatInputContainer {
+        display: flex;
+    }
+    #chatInput {
+        flex: 1;
+        padding: 5px;
+        font-size: 14px;
+        border: none;
+        outline: none;
+    }
+    #chatSend {
+        padding: 5px 10px;
+        cursor: pointer;
+        border: none;
+        background: #007bff;
+        color: white;
+    }
+
+</style>
+</head>
+<body>
+
+<h1>TRPG 맵</h1>
+
+<label>맵에 올릴 캐릭터 선택:</label>
+<select id="charSelect">
+    <option value="">선택하세요</option>
+</select>
+<button onclick="addCharacter()">맵에 추가</button>
+
+<div id="map"></div>
+<div id="chatContainer">
+        <div style="padding:5px; border-bottom:1px solid #ccc;">
+        <input type="text" id="chatName" placeholder="닉네임 입력" style="width:90%; padding:5px;">
+    </div>
+    <div id="chatMessages"></div>
+    <div id="chatInputContainer">
+        <input type="text" id="chatInput" placeholder="메시지를 입력하세요">
+        <button id="chatSend">전송</button>
+    </div>
+</div>
+<script>
+let map = document.getElementById('map');
+let charSelect = document.getElementById('charSelect');
+let characters = JSON.parse(localStorage.getItem("characterList") || "[]");
+let activeChar = null;
+
+characters.forEach((char, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = char.name;
+    charSelect.appendChild(option);
+});
+
+function addCharacter() {
+    const index = charSelect.value;
+    if(index === "") return;
+
+    const charData = characters[index];
+
+    const charDiv = document.createElement('div');
+    charDiv.className = 'char';
+    charDiv.style.top = '0px';
+    charDiv.style.left = '0px';
+    charDiv.dataset.index = index;
+
+    charDiv.innerHTML = `
+        ${charData.img ? `<img src="${charData.img}">` : `<div style="background:#000; width:50px; height:50px;"></div>`}
+        <div>${charData.name}</div>
+    `;
+
+    charDiv.addEventListener('click', function() {
+        activeChar = charDiv;
+        document.querySelectorAll('.char').forEach(c => c.style.border = '');
+        activeChar.style.border = '2px solid red';
+    });
+
+    map.appendChild(charDiv);
+}
+document.addEventListener('keydown', function(e) {
+    if(!activeChar) return;
+
+    const step = 10;
+    let top = parseInt(activeChar.style.top);
+    let left = parseInt(activeChar.style.left);
+
+    switch(e.key){
+        case 'ArrowUp': top -= step; break;
+        case 'ArrowDown': top += step; break;
+        case 'ArrowLeft': left -= step; break;
+        case 'ArrowRight': left += step; break;
+    }
+    top = Math.max(0, Math.min(map.clientHeight - activeChar.clientHeight, top));
+    left = Math.max(0, Math.min(map.clientWidth - activeChar.clientWidth, left));
+
+    activeChar.style.top = top + 'px';
+    activeChar.style.left = left + 'px';
+});
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+const chatMessages = document.getElementById('chatMessages');
+
+function addChatMessage(msg) {
+        const name = chatName.value.trim() || "익명";
+    const p = document.createElement('p');
+    p.textContent = `${name}: ${msg}`;
+    chatMessages.appendChild(p);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+chatSend.addEventListener('click', function() {
+    const msg = chatInput.value.trim();
+    if(msg !== '') {
+        addChatMessage(msg);
+        chatInput.value = '';
+    }
+});
+
+chatInput.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+        chatSend.click();
+    }
+});
+</script>
+
+</body>
+</html>
