@@ -15,18 +15,25 @@
     }
     .char {
         position: absolute;
-        width: 30px;
-        height: 30px;
+        width: 50px;
+        height: 50px;
         cursor: pointer;
         text-align: center;
-        font-size: 10px;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.6);
+        border-radius: 6px;
     }
     .char img {
-        width: 100%;
-        height: 100%;
+        width: 40px;
+        height: 40px;
         border-radius: 5px;
+        object-fit: cover;
     }
-        #chatContainer {
+    #chatContainer {
         position: fixed;
         bottom: 180px;
         right: 100px;
@@ -63,7 +70,31 @@
         background: #007bff;
         color: white;
     }
-
+    #arrowControls {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 120px;
+        height: 120px;
+        display: grid;
+        grid-template-columns: repeat(3, 40px);
+        grid-template-rows: repeat(3, 40px);
+        gap: 5px;
+    }
+    .arrow-btn {
+        background: #fff;
+        border: 2px solid #000;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+    }
+    .arrow-btn:active {
+        background: #ddd;
+    }
 </style>
 </head>
 <body>
@@ -78,7 +109,7 @@
 
 <div id="map"></div>
 <div id="chatContainer">
-        <div style="padding:5px; border-bottom:1px solid #ccc;">
+    <div style="padding:5px; border-bottom:1px solid #ccc;">
         <input type="text" id="chatName" placeholder="닉네임 입력" style="width:90%; padding:5px;">
     </div>
     <div id="chatMessages"></div>
@@ -87,11 +118,36 @@
         <button id="chatSend">전송</button>
     </div>
 </div>
+
+
+<div id="arrowControls">
+    <div></div>
+    <div class="arrow-btn" data-dir="up">↑</div>
+    <div></div>
+    <div class="arrow-btn" data-dir="left">←</div>
+    <div></div>
+    <div class="arrow-btn" data-dir="right">→</div>
+    <div></div>
+    <div class="arrow-btn" data-dir="down">↓</div>
+    <div></div>
+</div>
+
 <script>
 let map = document.getElementById('map');
 let charSelect = document.getElementById('charSelect');
+let chatName = document.getElementById('chatName');
 let characters = JSON.parse(localStorage.getItem("characterList") || "[]");
 let activeChar = null;
+
+
+if(characters.length === 0) {
+    characters = [
+        { name: "전사", img: "" },
+        { name: "도적", img: "" },
+        { name: "마법사", img: "" }
+    ];
+
+}
 
 characters.forEach((char, index) => {
     const option = document.createElement('option');
@@ -113,30 +169,40 @@ function addCharacter() {
     charDiv.dataset.index = index;
 
     charDiv.innerHTML = `
-        ${charData.img ? `<img src="${charData.img}">` : `<div style="background:#000; width:50px; height:50px;"></div>`}
-        <div>${charData.name}</div>
+        ${charData.img ? `<img src="${charData.img}" alt="${charData.name}">` : `<div style="width:40px; height:40px; background:#666; border-radius:4px;"></div>`}
+        <div style="margin-top:2px; font-size:12px;">${charData.name}</div>
     `;
 
-    charDiv.addEventListener('click', function() {
+    charDiv.addEventListener('click', function(e) {
         activeChar = charDiv;
         document.querySelectorAll('.char').forEach(c => c.style.border = '');
         activeChar.style.border = '2px solid red';
+        e.stopPropagation();
     });
 
     map.appendChild(charDiv);
 }
+
+
+map.addEventListener('click', function() {
+    activeChar = null;
+    document.querySelectorAll('.char').forEach(c => c.style.border = '');
+});
+
+
 document.addEventListener('keydown', function(e) {
     if(!activeChar) return;
 
     const step = 10;
-    let top = parseInt(activeChar.style.top);
-    let left = parseInt(activeChar.style.left);
+    let top = parseInt(activeChar.style.top || '0', 10);
+    let left = parseInt(activeChar.style.left || '0', 10);
 
     switch(e.key){
         case 'ArrowUp': top -= step; break;
         case 'ArrowDown': top += step; break;
         case 'ArrowLeft': left -= step; break;
         case 'ArrowRight': left += step; break;
+        default: return;
     }
     top = Math.max(0, Math.min(map.clientHeight - activeChar.clientHeight, top));
     left = Math.max(0, Math.min(map.clientWidth - activeChar.clientWidth, left));
@@ -144,12 +210,14 @@ document.addEventListener('keydown', function(e) {
     activeChar.style.top = top + 'px';
     activeChar.style.left = left + 'px';
 });
+
+
 const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
 
 function addChatMessage(msg) {
-        const name = chatName.value.trim() || "익명";
+    const name = (chatName && chatName.value.trim()) || "익명";
     const p = document.createElement('p');
     p.textContent = `${name}: ${msg}`;
     chatMessages.appendChild(p);
@@ -168,6 +236,32 @@ chatInput.addEventListener('keypress', function(e) {
     if(e.key === 'Enter') {
         chatSend.click();
     }
+});
+
+const arrowControls = document.getElementById('arrowControls');
+arrowControls.addEventListener('click', function(e) {
+    const btn = e.target.closest('.arrow-btn');
+    if(!btn) return;
+    if (!activeChar) return;
+
+    const dir = btn.dataset.dir;
+    const step = 10;
+
+    let top = parseInt(activeChar.style.top || '0', 10);
+    let left = parseInt(activeChar.style.left || '0', 10);
+
+    switch(dir) {
+        case 'up': top -= step; break;
+        case 'down': top += step; break;
+        case 'left': left -= step; break;
+        case 'right': left += step; break;
+    }
+
+    top = Math.max(0, Math.min(map.clientHeight - activeChar.clientHeight, top));
+    left = Math.max(0, Math.min(map.clientWidth - activeChar.clientWidth, left));
+
+    activeChar.style.top = top + 'px';
+    activeChar.style.left = left + 'px';
 });
 </script>
 
