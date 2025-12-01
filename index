@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRPG</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        header { background: #f2f2f2; padding: 20px; text-align: center; }
+        section { padding: 20px; line-height: 1.6; }
+        .intro { background: #fafafa; padding: 20px; border-radius: 8px; }
+        footer { margin-top: 40px; text-align: center; padding: 20px; background: #eee; }
+    </style>
+</head>
+<body>
+    <script>
+        function goTo(sectionId) {
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+    <header>
+        <h1>TRPG</h1>
+    </header>
+
+    <nav style="display:flex; gap:10px; padding:15px; background:#e8e8e8; justify-content:center;">
+        <button onclick="goTo('intro')">소개</button>
+        <button onclick="goTo('characters')">캐릭터</button>
+        <button onclick="goTo('rules')">규칙</button>
+        <button onclick="goTo('events')">주의사항</button>
+    </nav>
+
+    <section>
+        <div class="intro" id="intro">
+            <p>test용</p>
+            
+        </div>
+
+        <h2>사이트의 소개</h2>
+        <p>대충 아무말</p>
+
+        <h2>특징</h2>
+        <ul>
+            <li>독특한 캐릭터들과 특별한 규칙</li>
+            <li>이야기, 설정, 세계관을 자유롭게 확장 가능</li>
+        </ul>
+
+        <h2>앞으로의 계획</h2>
+        <p>대충 아무말</p>
+            <h2 id="characters">캐릭터 소개</h2>
+        <p></p>
+
+        <h3>예시 캐릭터</h3>
+        <ul>
+            <li><strong>렌</strong> — 이무기와 렌의 내공이 공명하면 극의의 검법인 창룡파천검을 펼칠 수 있습니다.</li>
+            <li><strong>카인</strong> — 고대신의 힘을 발현하여 적에게 죽음의 축복을 내리고 치명적인 일격을 날릴 수 있습니다.</li>
+            <li><strong>루미너스</strong> — 빛과 어둠의 힘을 사용하며 속성별 강화 효과를 받거나 혼합 상태에 진입하여 절대적인 힘을 사용합니다.</li>
+            <p>위의 캐릭터 예시는 게임 "메이플스토리"의 캐릭터 나무위키를 슬쩍한 것</p>
+        </ul>
+
+        <h2 id="rules">특별한 규칙</h2>
+        <p>TRPG는 모두가 자유롭게 상상할 수 있도록 몇 가지 기본 규칙을 가지고 있습니다.</p>
+        <ol>
+            <li>상상력은 언제나 환영합니다. 제약 없이 아이디어를 제시하세요.</li>
+            <li>방문자 간의 존중은 필수입니다.</li>
+            <li>새로운 설정과 캐릭터는 누구나 만들 수 있습니다.</li>
+        </ol>
+
+        <h2 id="events">주의사항</h2>
+        <p>타인이 만든 맵에 억지로 들어가려는 행동은 하지 말아주세요.</p>
+        <ul>
+            <li>상대를 배려한다-약속을 지킨다. 상대의 말에 귀기울인다. 상대 입장에서 생각한다.</li>
+            <li>묻지 않은것은 답하지 말아라-선생님과 선생질은 한끗 차이다. 너도 듣기 싫으면 하지 말아라.</li>
+            <li>서로의 대화에 집중하라-TRPG는 대화로 이루어진다. 세션에 집중하자.</li>
+            <li>다른 플레이어와 소통하며 서로의 즐거움을 존중하고 플레이에 방해가 되면 안된다.</li>
+
+  </section>
+
+<div style="text-align:center; margin:40px 0;">
+    <a href="dice.html" target="_blank">
+        <button style="padding:10px 20px; font-size:16px;">
+            🎲 주사위 페이지로 이동
+        </button>
+    </a>
+</div>
+
+<div style="text-align:center; margin:40px 0;">
+    <a href="character.html" target="_blank">
+        <button style="padding:10px 20px; font-size:16px;">
+            ✏ 캐릭터 작성하러 가기
+        </button>
+    </a>
+</div>
+
+<footer>
+    <p>© 2025 TRPG Project 작성자-Baby shark</p>
+</footer>
+
+</body>
+</html>
+
+
