@@ -119,7 +119,7 @@
     </div>
 </div>
 
-
+<!-- 화살표 컨트롤은 스크립트보다 먼저 두거나, 스크립트를 body 끝으로 옮기면 안전 -->
 <div id="arrowControls">
     <div></div>
     <div class="arrow-btn" data-dir="up">↑</div>
@@ -139,14 +139,14 @@ let chatName = document.getElementById('chatName');
 let characters = JSON.parse(localStorage.getItem("characterList") || "[]");
 let activeChar = null;
 
-
+// 샘플 캐릭터가 로컬스토리지에 없으면 예시 하나 넣어두기 (테스트용)
 if(characters.length === 0) {
     characters = [
         { name: "전사", img: "" },
         { name: "도적", img: "" },
         { name: "마법사", img: "" }
     ];
-
+    // localStorage.setItem("characterList", JSON.stringify(characters)); // 원하면 저장
 }
 
 characters.forEach((char, index) => {
@@ -183,13 +183,13 @@ function addCharacter() {
     map.appendChild(charDiv);
 }
 
-
+// 맵의 빈 공간을 클릭하면 선택 해제
 map.addEventListener('click', function() {
     activeChar = null;
     document.querySelectorAll('.char').forEach(c => c.style.border = '');
 });
 
-
+// 키보드 화살표 이동
 document.addEventListener('keydown', function(e) {
     if(!activeChar) return;
 
@@ -211,7 +211,7 @@ document.addEventListener('keydown', function(e) {
     activeChar.style.left = left + 'px';
 });
 
-
+// 채팅
 const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
@@ -238,6 +238,7 @@ chatInput.addEventListener('keypress', function(e) {
     }
 });
 
+// === 방향키 버튼 클릭 시 토큰 이동 (이벤트 위임 방식) ===
 const arrowControls = document.getElementById('arrowControls');
 arrowControls.addEventListener('click', function(e) {
     const btn = e.target.closest('.arrow-btn');
